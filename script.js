@@ -6,10 +6,32 @@ const getAllCharacters = async () => {
   return data.results;
 };
 
+const getAllCharactersFull = async () => {
+  const response = await fetch("https://rickandmortyapi.com/api/character");
+  const data = await response.json();
+  let allChars = data.results;
+  for (i = 2; i < data.info.pages; i++) {
+    const nextResponse = await fetch(
+      "https://rickandmortyapi.com/api/character/?page=" + i
+    );
+    const nextData = await nextResponse.json();
+    allChars.push(...nextData.results);
+  }
+  return allChars;
+};
+
 const getAllLocations = async () => {
   const response = await fetch("https://rickandmortyapi.com/api/location");
   const data = await response.json();
-  return data.results;
+  let allLoc = data.results;
+  for (i = 2; i < data.info.pages; i++) {
+    const nextResponse = await fetch(
+      "https://rickandmortyapi.com/api/location?page=" + i
+    );
+    const nextData = await nextResponse.json();
+    allLoc.push(...nextData.results);
+  }
+  return allLoc;
 };
 
 const getCharacterNameById = async (id) => {
@@ -140,7 +162,7 @@ const buildMostPopulatedLocations = (locations) => {
 };
 
 const startApp = async () => {
-  const characters = await getAllCharacters();
+  const characters = await getAllCharactersFull();
   const locations = await getAllLocations();
 
   console.log(characters);
@@ -148,7 +170,7 @@ const startApp = async () => {
 
   buildMostUsedCharacter(characters);
   buildMostPopulatedLocations(locations);
-  buildCharacters(characters, 10);
+  buildCharacters(characters, 100);
 };
 
 startApp();
