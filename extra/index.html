@@ -105,32 +105,43 @@
       },
     ];
 
-    const sum5hoursPrices = priceByHours
-      .map((hour, idx, arr) => {
-        let price5hour = 0;
-        if (idx < 20) {
-          for (let i = idx; i < idx + 5; i++) {
-            price5hour += +arr[i].price;
-          }
-        } else {
-          for (let i = 0; i < idx - 19; i++) {
-            price5hour += +arr[i].price;
-          }
-
-          for (let i = idx; i < 24; i++) {
-            price5hour += +arr[i].price;
-          }
+    const getNext5HoursPrice = (hour, idx, arr) => {
+      let price5hour = 0;
+      if (idx < 20) {
+        for (let i = idx; i < idx + 5; i++) {
+          price5hour += +arr[i].price;
         }
-        return {
-          price5hour: price5hour,
-          statringHour: idx,
-        };
-      })
+      } else {
+        for (let i = 0; i < idx - 19; i++) {
+          price5hour += +arr[i].price;
+        }
+
+        for (let i = idx; i < 24; i++) {
+          price5hour += +arr[i].price;
+        }
+      }
+      return {
+        price5hour: price5hour,
+        statringHour: idx,
+      };
+    };
+    const sum5hoursPricesReduce = priceByHours.reduce((acc, red, idx) => {
+      return getNext5HoursPrice(acc, acc.hour, priceByHours).price5hour <
+        getNext5HoursPrice(red, red.hour, priceByHours).price5hour
+        ? acc
+        : red;
+    });
+    const sum5hoursPricesMap = priceByHours
+      .map(getNext5HoursPrice)
       .sort((a, b) => a.price5hour - b.price5hour);
 
     console.log(
-      "Cheapes 5h price starts from hour: ",
-      sum5hoursPrices[0].statringHour
+      "Map. Cheapes 5h price starts from hour: ",
+      sum5hoursPricesMap[0].statringHour
+    );
+    console.log(
+      "Reduce. Cheapes 5h price starts from hour: ",
+      sum5hoursPricesReduce.hour
     );
   </script>
   <body></body>
